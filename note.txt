@@ -1,3 +1,4 @@
 1 python中值为false的情况：0、空字符串、None，其他都是true
 2 多重赋值语句写法	a=b c=d可以写成a,b=c,d
 3 if/else新写法	y=abs(1/x if x!=0 else 0)
+4 多个返回值	a,b=giveMeTwoNumbers();	return res1,res2

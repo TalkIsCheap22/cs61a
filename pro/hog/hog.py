@@ -22,6 +22,16 @@ def roll_dice(num_rolls, dice=six_sided):
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    flag=False
+    sum=0
+    for i in range(num_rolls):
+        temp=dice()
+        if flag==False:
+            sum+=temp
+        if temp==1:
+            flag=True
+            sum=1
+    return sum     
     # END PROBLEM 1
 
 
@@ -33,6 +43,7 @@ def free_bacon(score):
     assert score < 100, 'The game should be over.'
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    return 10-score%10+score//10
     # END PROBLEM 2
 
 
@@ -51,6 +62,10 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert opponent_score < 100, 'The game should be over.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    if num_rolls==0:
+        return free_bacon(opponent_score)
+    else:
+        return roll_dice(num_rolls,dice)
     # END PROBLEM 3
 
 
@@ -60,6 +75,9 @@ def is_swap(player_score, opponent_score):
     """
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    if abs(player_score%10-opponent_score%10)==(opponent_score%100-opponent_score%10)//10:
+        return True
+    return False
     # END PROBLEM 4
 
 
@@ -100,6 +118,33 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    prev0,prev1,dice_cnt=0,0,0
+    while score0<goal and score1<goal:
+        if who==0:
+            dice_cnt=strategy0(score0,score1)
+            dice_num=take_turn(strategy0(score0,score1),score1,dice)
+            score0+=dice_num
+            prev0+=dice_num
+            if feral_hogs and abs(dice_cnt-prev0)==2:
+                score0+=3
+                prev0+=3
+            if is_swap(score0,score1):
+                score0=score0+score1
+                score1=score0-score1
+                score0-=score1
+        else:
+            dice_cnt=strategy1(score1,score0)
+            dice_num=take_turn(strategy1(score1,score0),score0,dice)
+            score1+=dice_num
+            prev1+=dice_num
+            if feral_hogs and abs(dice_cnt-prev1)==2:
+                score1+=3
+                prev1+=3
+            if is_swap(score1,score0):
+                score0=score0+score1
+                score1=score0-score1
+                score0-=score1
+        who=1-who
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
