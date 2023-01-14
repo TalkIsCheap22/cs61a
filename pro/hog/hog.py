@@ -118,16 +118,15 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
-    prev0,prev1,dice_cnt=0,0,0
+    prev0,prev1=0,0
     while score0<goal and score1<goal:
         if who==0:
             dice_cnt=strategy0(score0,score1)
             dice_num=take_turn(strategy0(score0,score1),score1,dice)
             score0+=dice_num
-            prev0+=dice_num
             if feral_hogs and abs(dice_cnt-prev0)==2:
                 score0+=3
-                prev0+=3
+            prev0=dice_num
             if is_swap(score0,score1):
                 score0=score0+score1
                 score1=score0-score1
@@ -136,14 +135,14 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
             dice_cnt=strategy1(score1,score0)
             dice_num=take_turn(strategy1(score1,score0),score0,dice)
             score1+=dice_num
-            prev1+=dice_num
             if feral_hogs and abs(dice_cnt-prev1)==2:
                 score1+=3
-                prev1+=3
+            prev1=dice_num
             if is_swap(score1,score0):
                 score0=score0+score1
                 score1=score0-score1
                 score0-=score1
+        say=say(score0,score1)
         who=1-who
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
@@ -235,6 +234,24 @@ def announce_highest(who, last_score=0, running_high=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    def judge(score0,score1):
+        if who==0:
+            diff=score0-last_score
+            new_score=score0
+            new_high=running_high
+            if diff>running_high:
+                print(diff,"point(s)! That's the biggest gain yet for Player 0")
+                new_high=diff
+            return announce_highest(0,new_score,new_high)
+        else:
+            diff=score1-last_score
+            new_score=score1
+            new_high=running_high
+            if diff>running_high:
+                print(diff,"point(s)! That's the biggest gain yet for Player 1")
+                new_high=diff
+            return announce_highest(1,new_score,new_high)
+    return judge
     # END PROBLEM 7
 
 
@@ -274,6 +291,13 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def cal_average(*args):
+        sum=0
+        for i in range(trials_count):
+            sum+=original_function(*args)
+        sum/=trials_count
+        return sum
+    return cal_average
     # END PROBLEM 8
 
 
@@ -288,6 +312,14 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    max,index=0,0
+    average_func=make_averaged(roll_dice,trials_count)
+    for i in range(1,11,1):
+        average=average_func(i,dice)
+        if average>max:
+            max=average
+            index=i
+    return index
     # END PROBLEM 9
 
 
@@ -337,7 +369,9 @@ def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    if free_bacon(opponent_score)>=cutoff:
+        return 0
+    return num_rolls  # Replace this statement
     # END PROBLEM 10
 
 
@@ -347,7 +381,13 @@ def swap_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     non-beneficial swap. Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    score_zero=score+10-opponent_score%10+opponent_score//10
+    if abs(score_zero%10-opponent_score%10)==(opponent_score%100-opponent_score%10)//10:
+        if score_zero>opponent_score:
+            return num_rolls
+        elif score_zero<opponent_score:
+            return 0
+    return bacon_strategy(score,opponent_score,cutoff,num_rolls)  # Replace this statement
     # END PROBLEM 11
 
 
