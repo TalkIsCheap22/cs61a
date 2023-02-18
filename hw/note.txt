@@ -3,3 +3,6 @@
 2（t4）函数作为实参时，传递时执行函数体，将返回值传递给形参，所以形参不具有函数内部信息
 3（t5）x除以2,如果x/=2，x变为浮点数，所以需要x//=2
 
+03
+1 重点看count_change
+2 字符串格式化https://blog.csdn.net/zjbyough/article/details/96466658
